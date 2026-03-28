@@ -1,0 +1,23 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env.local
+    environment:
+      REDIS_HOST: redis
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 10
